@@ -21,9 +21,34 @@ namespace CapoLavoro2
         private float tempoMassimo;
         private float tempoMinimo;
         private float tempoDiscesa;
+        private string Nome;
+        private string Cognome;
+        private int Eta;
+        private string Categoria;
+        private int NumeroPettorale;
+        private string Sesso;
+        private int CodicePista;
+        private int Punti;
+        private float TempoDiscesa;
         public Form1()
         {
             InitializeComponent();
+            // Create a new TabControl
+            TabControl tabControl = new TabControl();
+
+            // Create three TabPages
+            TabPage tabPage1 = new TabPage("Pista");
+            TabPage tabPage2 = new TabPage("Sciatore");
+            TabPage tabPage3 = new TabPage("Classifica");
+
+            // Add the TabPages to the TabControl
+            tabControl.TabPages.Add(tabPage1);
+            tabControl.TabPages.Add(tabPage2);
+            tabControl.TabPages.Add(tabPage3);
+     
+
+            // Add the TabControl to the form
+            this.Controls.Add(tabControl);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -56,9 +81,9 @@ namespace CapoLavoro2
             public string Categoria { get; set; }
             public int NumeroPettorale { get; set; }
             public string Sesso { get; set; }
-            public float TempoDiscesa { get; set; }
             public int CodicePista { get; set; }
             public int Punti { get; set; }
+            public float TempoDiscesa { get; set; }
 
             public Sciatore(string nome, string cognome, int eta, string categoria, int numeroPettorale, string sesso, float tempoDiscesa,int codicePista,int punti)
             {
@@ -138,6 +163,7 @@ namespace CapoLavoro2
             }
 
             public void ModificaSciatore(Sciatore sciatoreModificato)
+               
             {
                 var sciatoreDaModificare = sciatori.FirstOrDefault(s => s.NumeroPettorale == sciatoreModificato.NumeroPettorale);
                 if (sciatoreDaModificare != null)
@@ -147,10 +173,14 @@ namespace CapoLavoro2
                     sciatoreDaModificare.Eta = sciatoreModificato.Eta;
                     sciatoreDaModificare.Categoria = sciatoreModificato.Categoria;
                     sciatoreDaModificare.Sesso = sciatoreModificato.Sesso;
-                }
+                    sciatoreDaModificare.CodicePista = sciatoreModificato.CodicePista;
+                    sciatoreDaModificare.TempoDiscesa = sciatoreModificato.TempoDiscesa;
+                }               
+                         
             }
         }
         #endregion
+
         #region Buttons
         private void button1_Click(object sender, EventArgs e)
         {
@@ -242,7 +272,6 @@ namespace CapoLavoro2
 
         private void button5_Click(object sender, EventArgs e)
         {
-           
             // Assumendo che tu abbia TextBox con questi nomi nel tuo form
             string nome = textBox6.Text;
             string cognome = textBox7.Text;
@@ -253,23 +282,23 @@ namespace CapoLavoro2
             int codicePista = int.Parse(textBox12.Text);
             int punti = 0;
 
+            Console.WriteLine(codicePista);
+
             // Genera un tempo di discesa casuale tra 30 e 120 secondi
-            
             Random random = new Random();
             float tempoDiscesa = random.Next(int.Parse(tempoMinimo.ToString()), int.Parse(tempoMassimo.ToString()));
 
-            
-                Sciatore sciatore = new Sciatore(nome, cognome, eta, categoria, numeroPettorale, sesso, tempoDiscesa,codicePista,punti);
-                gestioneSciatori.AggiungiSciatore(sciatore);
+            Sciatore sciatore = new Sciatore(nome, cognome, eta, categoria, numeroPettorale, sesso, tempoDiscesa, codicePista, punti);
+            gestioneSciatori.AggiungiSciatore(sciatore);
 
-                MessageBox.Show("Sciatore aggiunto correttamente");
-                textBox6.Clear();
-                textBox7.Clear();
-                textBox8.Clear();
-                textBox9.Clear();
-                textBox10.Clear();
-                textBox11.Clear();
-                textBox12.Clear();
+            MessageBox.Show("Sciatore aggiunto correttamente");
+            textBox6.Clear();
+            textBox7.Clear();
+            textBox8.Clear();
+            textBox9.Clear();
+            textBox10.Clear();
+            textBox11.Clear();
+            textBox12.Clear();
         }
         private void button6_Click(object sender, EventArgs e)
         {
@@ -284,22 +313,29 @@ namespace CapoLavoro2
 
         private void button7_Click(object sender, EventArgs e)
         {
+            // Crea un nuovo oggetto Sciatore con i valori delle textbox
             // Crea un nuovo sciatore dai valori dei TextBox
-            string nome = textBox6.Text;
-            string cognome = textBox7.Text;
-            int eta = int.Parse(textBox8.Text);
-            string categoria = textBox9.Text;
-            int numeroPettorale = int.Parse(textBox11.Text);
-            string sesso = textBox10.Text;
-            int codicePista = int.Parse(textBox12.Text);
-            int punti = 0;
+            Random random = new Random();
+            var sciatoreModificato = new Sciatore(Nome, Cognome, Eta, Categoria, NumeroPettorale, Sesso, TempoDiscesa, CodicePista, Punti)
+            {
+                Nome = textBox6.Text,
+                Cognome = textBox7.Text,
+                Eta = int.Parse(textBox8.Text),
+                Categoria = textBox9.Text,
+                NumeroPettorale = int.Parse(textBox11.Text),
+                Sesso = textBox10.Text,
+                CodicePista = int.Parse(textBox12.Text),
+                Punti = 0,
+                TempoDiscesa = random.Next(int.Parse(tempoMinimo.ToString()), int.Parse(tempoMassimo.ToString()))
+
+            };
+
+            // Chiama la funzione di modifica
 
             if (textBox12.Text.Length == 6)
             {
                 // Modifica lo sciatore
-
-                Sciatore sciatore = new Sciatore(nome, cognome, eta, categoria, numeroPettorale, sesso, tempoDiscesa, codicePista, punti);
-                gestioneSciatori.ModificaSciatore(sciatore);
+                gestioneSciatori.ModificaSciatore(sciatoreModificato);
 
                 MessageBox.Show("Sciatore modificato correttamente");
                 textBox6.Clear();

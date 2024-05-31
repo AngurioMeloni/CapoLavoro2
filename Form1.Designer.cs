@@ -64,6 +64,7 @@
             this.button8 = new System.Windows.Forms.Button();
             this.textBox12 = new System.Windows.Forms.TextBox();
             this.label14 = new System.Windows.Forms.Label();
+            this.button9 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // listView1
@@ -376,11 +377,22 @@
             this.label14.TabIndex = 35;
             this.label14.Text = "Codice Univoco";
             // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(539, 225);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(97, 23);
+            this.button9.TabIndex = 36;
+            this.button9.Text = "Classifica";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1493, 638);
+            this.Controls.Add(this.button9);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.textBox12);
             this.Controls.Add(this.button8);
@@ -463,6 +475,7 @@
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.TextBox textBox12;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Button button9;
     }
 }
 
