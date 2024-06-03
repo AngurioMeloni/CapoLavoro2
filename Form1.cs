@@ -9,11 +9,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using static CapoLavoro2.Form1;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace CapoLavoro2
 {
+        #region Form1
     public partial class Form1 : Form
     {
         private GestionePiste gestionePiste = new GestionePiste();
@@ -33,28 +35,111 @@ namespace CapoLavoro2
         public Form1()
         {
             InitializeComponent();
+
             // Create a new TabControl
             TabControl tabControl = new TabControl();
+            tabControl.Dock = DockStyle.Fill;
 
             // Create three TabPages
-            TabPage tabPage1 = new TabPage("Pista");
-            TabPage tabPage2 = new TabPage("Sciatore");
+            TabPage tabPage1 = new TabPage("Profilo Pista");
+            TabPage tabPage2 = new TabPage("Profilo Sciatore");
             TabPage tabPage3 = new TabPage("Classifica");
 
             // Add the TabPages to the TabControl
             tabControl.TabPages.Add(tabPage1);
             tabControl.TabPages.Add(tabPage2);
             tabControl.TabPages.Add(tabPage3);
-     
 
             // Add the TabControl to the form
             this.Controls.Add(tabControl);
+
+            listView1.Hide();
+            listView2.Hide();
+            listView3.Hide();
+            // Hide all TextBoxes, Labels, and Buttons
+            foreach (Control control in this.Controls)
+            {
+                if (control is System.Windows.Forms.TextBox || control is Label || control is System.Windows.Forms.Button)
+                {
+                    control.Visible = false;
+                }
+            }
+
+            // Handle the SelectedIndexChanged event
+            tabControl.SelectedIndexChanged += (s, e) =>
+            {
+                // Hide all TextBoxes, Labels, and Buttons
+                foreach (Control control in this.Controls)
+                {
+                    if (control is System.Windows.Forms.TextBox || control is Label || control is System.Windows.Forms.Button)
+                    {
+                        control.Visible = false;
+                    }
+                }
+
+                listView1.Hide();
+                listView2.Hide();
+                listView3.Hide();
+
+                // Check if tabPage1 is selected
+                if (tabControl.SelectedTab == tabPage1)
+                {
+                    textBox1.Show();
+                    textBox2.Show();
+                    textBox3.Show();
+                    textBox4.Show();
+                    textBox5.Show();
+                    label1.Show();
+                    label2.Show();
+                    label3.Show();
+                    label4.Show();
+                    label5.Show();
+                    label6.Show();
+                    button1.Show();
+                    button2.Show();
+                    button3.Show();
+                    button4.Show();
+                    listView1.Show();
+                }
+                else if (tabControl.SelectedTab == tabPage2)
+                {
+                    textBox6.Show();
+                    textBox7.Show();
+                    textBox8.Show();
+                    textBox9.Show();
+                    textBox10.Show();
+                    textBox11.Show();
+                    textBox12.Show();
+                    label7.Show();
+                    label8.Show();
+                    label9.Show();
+                    label10.Show();
+                    label11.Show();
+                    label12.Show();
+                    label13.Show();
+                    label14.Show();
+                    button5.Show();
+                    button6.Show();
+                    button7.Show();
+                    button8.Show();
+                    listView2.Show();
+                }
+                else if (tabControl.SelectedTab == tabPage3)
+                {
+                    button9.Show();
+                    button10.Show();
+                    listView3.Show();
+                }
+            };
         }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
+        #endregion
+
         #region Classi
         public class Pista
         {
@@ -62,7 +147,7 @@ namespace CapoLavoro2
             public float TempoMinimo { get; set; }
             public int NumeroPettoraliTotali { get; set; }
             public string TipoGara { get; set; }
-            public int Codice { get; set;}
+            public int Codice { get; set; }
 
             public Pista(float tempoMassimo, float tempoMinimo, int numeroPettoraliTotali, string tipoGara, int codice)
             {
@@ -85,7 +170,7 @@ namespace CapoLavoro2
             public int Punti { get; set; }
             public float TempoDiscesa { get; set; }
 
-            public Sciatore(string nome, string cognome, int eta, string categoria, int numeroPettorale, string sesso, float tempoDiscesa,int codicePista,int punti)
+            public Sciatore(string nome, string cognome, int eta, string categoria, int numeroPettorale, string sesso, float tempoDiscesa, int codicePista, int punti)
             {
                 Nome = nome;
                 Cognome = cognome;
@@ -93,11 +178,19 @@ namespace CapoLavoro2
                 Categoria = categoria;
                 NumeroPettorale = numeroPettorale;
                 Sesso = sesso;
-                TempoDiscesa = tempoDiscesa; 
+                TempoDiscesa = tempoDiscesa;
                 CodicePista = codicePista;
                 Punti = punti;
             }
         }
+        public class Gara
+        {
+            public int CodicePista { get; set; }
+            public List<Sciatore> Partecipanti { get; set; }
+            public List<Sciatore> Classifica { get; set; }
+
+        }
+
         #endregion
 
         #region GestionePiste
@@ -163,7 +256,7 @@ namespace CapoLavoro2
             }
 
             public void ModificaSciatore(Sciatore sciatoreModificato)
-               
+
             {
                 var sciatoreDaModificare = sciatori.FirstOrDefault(s => s.NumeroPettorale == sciatoreModificato.NumeroPettorale);
                 if (sciatoreDaModificare != null)
@@ -175,10 +268,45 @@ namespace CapoLavoro2
                     sciatoreDaModificare.Sesso = sciatoreModificato.Sesso;
                     sciatoreDaModificare.CodicePista = sciatoreModificato.CodicePista;
                     sciatoreDaModificare.TempoDiscesa = sciatoreModificato.TempoDiscesa;
-                }               
-                         
+                }
+
             }
+            public string StampaGaraInJson()
+            {
+                List<Gara> gare = new List<Gara>();
+                
+                // Ottieni tutti i codici pista univoci dagli sciatori iscritti
+                var codiciPista = Sciatori.Select(s => s.CodicePista).Distinct();
+
+                foreach (int codice in codiciPista)
+                {
+                    // Filtra gli sciatori per codice pista
+                    var partecipanti = Sciatori.Where(s => s.CodicePista == codice).ToList();
+
+                    // Ordina gli sciatori per tempo di discesa per creare la classifica
+                    var classifica = partecipanti.OrderBy(s => s.TempoDiscesa).ToList();
+                    // Crea un nuovo oggetto Gara
+                    var gara = new Gara
+                    {
+                        CodicePista = codice,
+                        Partecipanti = partecipanti,
+                        Classifica = classifica,
+                    };
+
+                    gare.Add(gara);
+                }
+
+                // Converte la lista di gare in una stringa JSON
+                string json = JsonConvert.SerializeObject(gare, Formatting.Indented);
+                System.IO.File.WriteAllText("file.json", json);
+
+                return json;
+            }
+
         }
+       
+
+
         #endregion
 
         #region Buttons
@@ -211,7 +339,7 @@ namespace CapoLavoro2
                 MessageBox.Show("Il codice deve essere di 6 cifre.");
             }
         }
-    
+
         private void button3_Click(object sender, EventArgs e)
         {
             // Prendi il codice dalla TextBox e convertilo in un intero
@@ -380,73 +508,91 @@ namespace CapoLavoro2
             }
         }
         private void button9_Click(object sender, EventArgs e)
-        {
-            // Ordina la lista di sciatori in base al tempo di discesa (in ordine ascendente)
-            var sciatoriOrdinati = gestioneSciatori.Sciatori.OrderBy(s => s.TempoDiscesa).ToList();
+        {// Raggruppa gli sciatori per codice pista
+            var sciatoriPerPista = gestioneSciatori.Sciatori.GroupBy(s => s.CodicePista);
 
-            // Assegna i punti in base alla posizione
-            for (int i = 0; i < sciatoriOrdinati.Count; i++)
+            // Prepara la ListView
+            listView3.Items.Clear();
+            listView3.Columns.Clear();
+            listView3.View = View.Details;
+            listView3.Columns.Add("Gara").Width = 70;
+            listView3.Columns.Add("Posizione").Width = 70;
+            listView3.Columns.Add("Nome").Width = 120;
+            listView3.Columns.Add("Cognome").Width = 120;
+            listView3.Columns.Add("Tempo Discesa").Width = 120;
+            listView3.Columns.Add("Punti").Width = 70;
+
+            int gara = 1;
+
+            foreach (var gruppo in sciatoriPerPista)
             {
-                switch (i)
+                // Ordina gli sciatori del gruppo in base al tempo di discesa (in ordine ascendente)
+                var sciatoriOrdinati = gruppo.OrderBy(s => s.TempoDiscesa).ToList();
+
+                // Assegna i punti in base alla posizione
+                for (int i = 0; i < sciatoriOrdinati.Count; i++)
                 {
-                    case 0:
-                        sciatoriOrdinati[i].Punti = 25;
-                        break;
-                    case 1:
-                        sciatoriOrdinati[i].Punti = 18;
-                        break;
-                    case 2:
-                        sciatoriOrdinati[i].Punti = 15;
-                        break;
-                    case 3:
-                        sciatoriOrdinati[i].Punti = 12;
-                        break;
-                    case 4:
-                        sciatoriOrdinati[i].Punti = 10;
-                        break;
-                    case 5:
-                        sciatoriOrdinati[i].Punti = 8;
-                        break;
-                    case 6:
-                        sciatoriOrdinati[i].Punti = 6;
-                        break;
-                    case 7:
-                        sciatoriOrdinati[i].Punti = 4;
-                        break;
-                    case 8:
-                        sciatoriOrdinati[i].Punti = 2;
-                        break;
-                    case 9:
-                        sciatoriOrdinati[i].Punti = 1;
-                        break;
-                    default:
-                        sciatoriOrdinati[i].Punti = 0;
-                        break;
+                    switch (i)
+                    {
+                        case 0:
+                            sciatoriOrdinati[i].Punti = 25;
+                            break;
+                        case 1:
+                            sciatoriOrdinati[i].Punti = 18;
+                            break;
+                        case 2:
+                            sciatoriOrdinati[i].Punti = 15;
+                            break;
+                        case 3:
+                            sciatoriOrdinati[i].Punti = 12;
+                            break;
+                        case 4:
+                            sciatoriOrdinati[i].Punti = 10;
+                            break;
+                        case 5:
+                            sciatoriOrdinati[i].Punti = 8;
+                            break;
+                        case 6:
+                            sciatoriOrdinati[i].Punti = 6;
+                            break;
+                        case 7:
+                            sciatoriOrdinati[i].Punti = 4;
+                            break;
+                        case 8:
+                            sciatoriOrdinati[i].Punti = 2;
+                            break;
+                        case 9:
+                            sciatoriOrdinati[i].Punti = 1;
+                            break;
+                        default:
+                            sciatoriOrdinati[i].Punti = 0;
+                            break;
+                    }
                 }
-            }
 
+                for (int i = 0; i < sciatoriOrdinati.Count; i++)
+                {
+                    ListViewItem item = new ListViewItem(gara.ToString());
+                    item.SubItems.Add((i + 1).ToString());
+                    item.SubItems.Add(sciatoriOrdinati[i].Nome);
+                    item.SubItems.Add(sciatoriOrdinati[i].Cognome);
+                    item.SubItems.Add(sciatoriOrdinati[i].TempoDiscesa.ToString());
+                    item.SubItems.Add(sciatoriOrdinati[i].Punti.ToString());
 
-            // Aggiorna la visualizzazione
-            listView2.Items.Clear();
-            listView2.Columns.Clear();
-            listView2.View = View.Details;
-            listView2.Columns.Add("Posizione").Width = 70;
-            listView2.Columns.Add("Nome").Width = 120;
-            listView2.Columns.Add("Cognome").Width = 120;
-            listView2.Columns.Add("Tempo Discesa").Width = 120;
-            listView2.Columns.Add("Punti").Width = 70;
-            for (int i = 0; i < sciatoriOrdinati.Count; i++)
-            {
-                ListViewItem item = new ListViewItem((i + 1).ToString());
-                item.SubItems.Add(sciatoriOrdinati[i].Nome);
-                item.SubItems.Add(sciatoriOrdinati[i].Cognome);
-                item.SubItems.Add(sciatoriOrdinati[i].TempoDiscesa.ToString());
-                item.SubItems.Add(sciatoriOrdinati[i].Punti.ToString());
+                    listView3.Items.Add(item);
+                }
 
-                listView2.Items.Add(item);
+                gara++;
             }
 
             MessageBox.Show("Classifica aggiornata correttamente");
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            string json = gestioneSciatori.StampaGaraInJson();
+            MessageBox.Show("Json Creato Correttamente");
+
         }
     }
 }
