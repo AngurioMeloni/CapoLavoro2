@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using static CapoLavoro2.Form1;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Diagnostics;
 
 namespace CapoLavoro2
 {
@@ -128,10 +129,13 @@ namespace CapoLavoro2
                 {
                     button9.Show();
                     button10.Show();
+                    button11.Show();
                     listView3.Show();
                 }
             };
+ 
         }
+
 
 
         private void Form1_Load(object sender, EventArgs e)
@@ -428,7 +432,7 @@ namespace CapoLavoro2
             textBox11.Clear();
             textBox12.Clear();
         }
-        private void button6_Click(object sender, EventArgs e)
+            private void button6_Click(object sender, EventArgs e)
         {
             // Assumendo che tu abbia un TextBox con questo nome nel tuo form
             int numeroPettorale = int.Parse(textBox11.Text);
@@ -593,6 +597,45 @@ namespace CapoLavoro2
             string json = gestioneSciatori.StampaGaraInJson();
             MessageBox.Show("Json Creato Correttamente");
 
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            StringBuilder html = new StringBuilder();
+
+            html.AppendLine("<!DOCTYPE html>");
+            html.AppendLine("<html>");
+            html.AppendLine("<head>");
+            html.AppendLine("<title>My Website</title>");
+            html.AppendLine("</head>");
+            html.AppendLine("<body>");
+            html.AppendLine("<h1>Welcome to my website!</h1>");
+            html.AppendLine("<h2>Classifiche delle gare</h2>");
+            html.AppendLine("<table border='1'>");
+            html.AppendLine("<tr>");
+            html.AppendLine("<th>Posizione</th>");
+            html.AppendLine("<th>Nome</th>");
+            html.AppendLine("<th>Tempo</th>");
+            html.AppendLine("<th>Numero Pettorale</th>");
+            html.AppendLine("</tr>");
+
+            // Inserisci qui le righe della classifica
+            foreach (var gara in gare)
+            {
+                html.AppendLine("<tr>");
+                html.AppendLine("<td>" + gara.Posizione + "</td>");
+                html.AppendLine("<td>" + gara.Nome + "</td>");
+                html.AppendLine("<td>" + gara.Tempo + "</td>");
+                html.AppendLine("<td>" + gara.NumeroPettorale + "</td>");
+                html.AppendLine("</tr>");
+            }
+
+            html.AppendLine("</table>");
+            html.AppendLine("</body>");
+            html.AppendLine("</html>");
+
+            File.WriteAllText("website.html", html.ToString());
+            Process.Start("website.html");
         }
     }
 }

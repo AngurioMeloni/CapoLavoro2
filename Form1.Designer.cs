@@ -418,6 +418,7 @@
             this.button11.TabIndex = 39;
             this.button11.Text = "Stampa del sito web";
             this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
             // Form1
             // 
